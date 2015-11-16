@@ -11,7 +11,7 @@ module FPM
         end
 
         def package_setup
-          fpm.version = recipe.version
+          fpm.version, fpm.epoch = split_version(recipe.version)
 
           fpm.attributes[:gem_fix_name?] = true
           fpm.attributes[:gem_fix_dependencies?] = true
@@ -21,6 +21,14 @@ module FPM
           recipe.environment.with_clean do
             fpm.input(recipe.name)
           end
+        end
+
+        private
+
+        def split_version(version)
+          epoch, version = version.split(':', 2)
+
+          version.nil? ? [epoch, nil] : [version, epoch]
         end
       end
     end
